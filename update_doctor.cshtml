@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        var id = info[0];
+        var name = info[1];
+        var department = info[2];
+        var gender = info[3];
+        var mobile = info[4];
+        var fee = info[5];
+        cmd.CommandText = "update doctor set doctor_name =  @name, department =  @department, gender = @gender, mobile = @mobile, fee = @fee where doctor_id = @id";
+        SqlParameter p1 = new SqlParameter("@name", SqlDbType.VarChar);
+        p1.Value = @name;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@department", SqlDbType.VarChar);
+        p2.Value = @department;
+        cmd.Parameters.Add(p2);
+        SqlParameter p3 = new SqlParameter("@gender", SqlDbType.VarChar);
+        p3.Value = @gender;
+        cmd.Parameters.Add(p3);
+        SqlParameter p4 = new SqlParameter("@mobile", SqlDbType.VarChar);
+        p4.Value = @mobile;
+        cmd.Parameters.Add(p4);
+        SqlParameter p5 = new SqlParameter("@fee", SqlDbType.VarChar);
+        p5.Value = @fee;
+        cmd.Parameters.Add(p5);
+        SqlParameter p6 = new SqlParameter("@id", SqlDbType.Int);
+        p6.Value = @id;
+        cmd.Parameters.Add(p6);
+        cmd.ExecuteNonQuery();
+        connection.Close();
+    }
+</body>
+</html>

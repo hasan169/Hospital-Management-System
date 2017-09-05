@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @RenderPage("navbar.cshtml")
+    <div class="container-fluid">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="row">
+            <div class="col-md-9">
+                <div style="width:100%;height:105px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                    <h2 style="margin-left:30%;color:#373e4a"> Hospital Managment  System</h2>
+                    <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+                </div>
+                <div style="margin-top:20px"></div>
+                <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Patient</h4>
+                <h1></h1>
+
+                <div class="container">
+                    <form class="form-horizontal" method="post" action="">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Full Name:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="patient" placeholder="Enter Full Name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2"> Address:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="address" placeholder="Enter Address">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Age:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="age" placeholder="Enter Age">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Gender:</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="gender">
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Mobile:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="mobile" placeholder="Enter Mobile-no">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Blood Group:</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="blood">
+                                    <option>A+</option>
+                                    <option>A-</option>
+                                    <option>AB+</option>
+                                    <option>B+</option>
+                                    <option>B-</option>
+                                    <option>O+</option>
+                                    <option>O-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="submit" class="btn btn-primary" value="Register" />
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @{
+        if (IsPost)
+        {
+            var a = 0;
+            var name = Request["patient"];
+            var address = Request["address"];
+            var age = Request["age"];
+            var mobile = Request["mobile"];
+            var blood = Request["blood"];
+            var gender = Request["gender"];
+            var admission = DateTime.Now.ToString("MM-dd-yyyy");
+            var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+            var cmd = connection.CreateCommand();
+            connection.Open();
+            cmd.CommandText = "select count(patient_id) as total from patient";
+            var row = cmd.ExecuteReader();
+            while(row.Read()){
+                a = (int) row["total"];
+            }
+            var id = @a + 1;
+            row.Close();
+            cmd.CommandText = "INSERT INTO patient (patient_id,patient_name,patient_address,age,blood,mobile,admission,gender) VALUES  (@id , @name, @address, @age,  @blood ,@mobile,@admission,@gender)";
+            SqlParameter p1 = new SqlParameter("@id", SqlDbType.Int);
+            p1.Value = @id;
+            cmd.Parameters.Add(p1);
+            SqlParameter p2 = new SqlParameter("@Name", SqlDbType.VarChar);
+            p2.Value = @name;
+            cmd.Parameters.Add(p2);
+            SqlParameter p3 = new SqlParameter("@address", SqlDbType.VarChar);
+            p3.Value = @address;
+            cmd.Parameters.Add(p3);
+            SqlParameter p4 = new SqlParameter("@age", SqlDbType.VarChar);
+            p4.Value = @age;
+            cmd.Parameters.Add(p4);
+            SqlParameter p5 = new SqlParameter("@blood", SqlDbType.VarChar);
+            p5.Value = @blood;
+            cmd.Parameters.Add(p5);
+            SqlParameter p6 = new SqlParameter("@mobile", SqlDbType.VarChar);
+            p6.Value = @mobile;
+            cmd.Parameters.Add(p6);
+            SqlParameter p7 = new SqlParameter("@admission", SqlDbType.Date);
+            p7.Value = @admission;
+            cmd.Parameters.Add(p7);
+            SqlParameter p8 = new SqlParameter("@gender", SqlDbType.VarChar);
+            p8.Value = @gender;
+            cmd.Parameters.Add(p8);
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+</body>
+</html>

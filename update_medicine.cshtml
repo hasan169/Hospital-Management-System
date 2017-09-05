@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        var id = info[0];
+        var name = info[1];
+        var price = info[2];
+        cmd.CommandText = "update medicine set medicine_name =  @name, medicine_price =  @price where medicine_id = @id"; 
+        SqlParameter p1 = new SqlParameter("@name", SqlDbType.VarChar);
+        p1.Value = @name;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@price", SqlDbType.Int);
+        p2.Value = @price;
+        cmd.Parameters.Add(p2);
+        SqlParameter p4 = new SqlParameter("@id", SqlDbType.Int);
+        p4.Value = @id;
+        cmd.Parameters.Add(p4);
+        cmd.ExecuteNonQuery();
+        connection.Close();
+    }
+</body>
+</html>

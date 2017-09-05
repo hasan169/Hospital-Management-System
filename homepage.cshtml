@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<html>
+<head>
+    <title></title>
+    <style>
+        a:hover {
+            background-color: #fafafa;
+            text-decoration: none !important;
+        }
+    </style>
+</head>
+<body>
+    @RenderPage("navbar.cshtml")
+    <div class="container-fluid" style="display:inline">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="row">
+            <div class="col-md-9">
+                <div style="width:100%;height:93px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                    <h2 style="margin-left:30%;color:#373e4a;margin-top:-10px"> Hospital Managment  System</h2>
+                    <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+                </div>
+                <div style="margin-top:20px"></div>
+                <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline"> Admin DashBoard</h4>
+                <div style="margin-top:60px"></div>
+                <a href="~/doctor.cshtml" style="margin-top:5px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#f56954;margin-left:30%;margin-top:20%;font-size:30px"> Doctor </p> </a>
+                <a href="~/patient.cshtml" style="margin-top:5px;margin-left:20px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#303641;margin-left:30%;margin-top:20%;font-size:30px"> Patient </p> </a>
+                <a href="~/employee.cshtml" style="margin-top:5px;margin-left:20px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#00c0ef;margin-left:25%;margin-top:20%;font-size:30px"> Employee </p> </a>
+                <a href="~/cabin.cshtml" style="margin-top:5px;margin-left:20px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#00b29e;margin-left:30%;margin-top:20%;font-size:30px"> Cabin </p> </a>
+                <div style="margin-top:10px"></div>
+                <a href="~/bed.cshtml" style="margin-top:5px;border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#ba79cb;margin-left:30%;margin-top:20%;font-size:30px"> Bed </p> </a>
+                <a href="~/medicine.cshtml" style="margin-top:5px;margin-left:20px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#00a65a;margin-left:15%;margin-top:20%;font-size:30px"> Medicine </p> </a>
+                <a href="~/diagnosis.cshtml" style="margin-top:5px;margin-left:20px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#ffa812;margin-left:15%;margin-top:20%;font-size:30px"> Diagnosis </p> </a>
+                <a href="~/department.cshtml" style="margin-top:5px;margin-left:20px; border-style: groove;border-radius:5px; border-width:thin; border-color:#eeeeee;display:inline-block;height:120px;width:220px"> <p style="color:#6c541e;margin-left:15%;margin-top:20%;font-size:30px"> Department </p> </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

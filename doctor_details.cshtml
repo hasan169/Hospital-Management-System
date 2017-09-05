@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    function update(id) {
+        var name = document.getElementById("doctor").value;
+        var department = document.getElementById("department").value;
+        var selector = document.getElementById("gender");
+        var gender = selector[selector.selectedIndex].value;
+        var mobile = document.getElementById("mobile").value;
+        var fee = document.getElementById("fee").value;
+        var info = [];
+        info.push(id);
+        info.push(name);
+        info.push(department);
+        info.push(gender);
+        info.push(mobile);
+        info.push(fee);
+        $.ajax({
+            type: "POST",
+            url: "update_doctor",
+            data: JSON.stringify(info),
+            datatype: "html",
+            success: function () {
+                alert("updated");
+            }
+        });
+    };
+</script>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @RenderPage("navbar.cshtml")
+    <div class="container-fluid">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="col-md-9">
+            <div style="width:100%;height:103px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                <h2 style="margin-left:30%;color:#373e4a"> Hospital Managment  System</h2>
+                <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+            </div>
+            <div style="margin-top:20px"></div>
+            <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Profile</h4>
+            @{
+                var name = "";
+                var department = "";
+                var gender = "";
+                var mobile = "";
+                var fee = 1;
+                var id = Request["id"];
+                var gen1 = "Male";
+                var gen2 = "Female";
+            }
+            @{
+                var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+                var cmd = connection.CreateCommand();
+                connection.Open();
+                cmd.CommandText = "select * from doctor where doctor_id = " + @id;
+                var row = cmd.ExecuteReader();
+            }
+            @if (row.Read())
+            {
+                name = (string)row["doctor_name"];
+                department = (string)row["department"];
+                mobile = (string)row["mobile"];
+                fee = (int)row["fee"];
+                gender = (string)row["gender"];
+                if (gender == "Female")
+                {
+                    gen1 = "Female";
+                    gen2 = "Male";
+                }
+                row.Close();
+                cmd.CommandText = "select dept_name from department";
+                row = cmd.ExecuteReader();
+            }
+            @{
+                <div class="container">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Full Name:</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control" rows="1" id="doctor"> @name</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Department:</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="department">
+                                    <option>@department</option>
+                                    @while(row.Read()){
+                                        string dept = (string) row["dept_name"];
+                                        if (@dept != @department)
+                                        {
+                                            <option>@dept</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Gender:</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="gender">
+                                    <option>@gen1</option>
+                                    <option>@gen2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Mobile:</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control" rows="1" id="mobile"> @mobile</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Doctor Fee:</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control" rows="1" id="fee"> @fee</textarea>
+                            </div>
+                        </div>
+                    </form>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button class="btn btn-primary" onclick="update(@id)"> Update </button>
+                            </div>
+                        </div>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

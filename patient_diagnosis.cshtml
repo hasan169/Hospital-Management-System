@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    function add_diagnosis(id) {
+        var selector = document.getElementById("diagnosis");
+        var did = selector[selector.selectedIndex].id;
+        var date = document.getElementById("date").value;
+        var info = [];
+        info.push(did);
+        info.push(id);
+        info.push(date);
+        $.ajax({
+            type: "POST",
+            url: "add_diagnosis",
+            data: JSON.stringify(info),
+            datatype: "html",
+            success: function () {
+                alert("success");
+            }
+        });
+    };
+    function func(id) {
+        document.getElementById("appoint").href = "appointment.cshtml?id=" + id;
+        document.getElementById("check").href = "doctor_fee.cshtml?id=" + id;
+        document.getElementById("admit_cabin").href = "admit_cabin.cshtml?id=" + id;
+        document.getElementById("admit_bed").href = "admit_bed.cshtml?id=" + id;
+        document.getElementById("med").href = "buy_medicine.cshtml?id=" + id;
+        document.getElementById("diag").href = "patient_diagnosis.cshtml?id=" + id;
+        document.getElementById("cabin_bill").href = "Cabin Bill.cshtml?id=" + id;
+        document.getElementById("bed_bill").href = "Bed Bill.cshtml?id=" + id;
+        document.getElementById("medicine_bill").href = "medicine_bill.cshtml?id=" + id;
+        document.getElementById("diagnosis_bill").href = "diagnosis_bill.cshtml?id=" + id;
+        document.getElementById("cabin_bed_bill").href = "checkup.cshtml?id=" + id;
+    };
+</script>
+<html>
+<head>
+
+    <title></title>
+</head>
+<body>
+    @RenderPage("sidebar.cshtml")
+    @{
+
+        var id = (string)Request["id"];
+        <script>
+                func(@id);
+        </script>
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        cmd.CommandText = "select * from diagnosis";
+        var row = cmd.ExecuteReader();
+    }
+    <div class="container-fluid">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="col-md-9">
+            <div style="width:100%;height:83px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                <h2 style="margin-left:30%;color:#373e4a"> Hospital Managment  System</h2>
+                <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+            </div>
+            <div style="margin-top:20px"></div>
+            <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Diagnosis</h4>
+            <div style="margin-top:30px"></div>
+            <div class="container">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2">Diagnosis Name:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="diagnosis">
+                                @while (row.Read())
+                                {
+                                    var name = row["diagnosis_name"];
+                                    var mid = row["diagnosis_id"];
+                                    <option id="@mid">@name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2"> Date:</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" type="date" id="date" />
+                        </div>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" onclick="add_diagnosis(@id)" class="btn btn-primary">Add Test</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="~/css/bootstrap.min.css" rel="stylesheet">
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    var current_low;
+    var current_high;
+    var low;
+    var high;
+    function func() {
+        window.location.href = "employee_reg.cshtml";
+    };
+    function details(ob) {
+
+        window.location.href = "employee_details.cshtml?id=" + ob.id;
+    };
+    function prev(mark) {
+        if (mark == 3) {
+            current_low = 1;
+        }
+        if (mark == 1) {
+            if (current_low != low) {
+                current_low = current_low - 10;
+                current_high = current_high - 10;
+            }
+        }
+        else if (mark == 2) {
+            if (current_high != high) {
+                current_low = current_high + 1;
+            }
+        }
+        var name = document.getElementById("search").value;
+        var info = [];
+        info.push(current_low);
+        info.push(name.trim());
+        $.ajax({
+            type: "POST",
+            url: "getemployee.cshtml",
+            data: JSON.stringify(info),
+            datatype: "html",
+            success: function (data) {
+                var arr = $.parseJSON(data);
+                if (mark == 3) {
+                    var num = arr.length / 6;
+                    num--;
+                    low = parseInt(arr[0]);
+                    current_low = low;
+                    high = arr[6 * num];
+                }
+                var counter = 0;
+                for (var i = 1; i <= 10 ; i++) {
+                    var id;
+                    if (counter < arr.length) {
+                        id = arr[counter];
+                        current_high = parseInt(id);
+                    }
+                    var flag = false;
+                    var x = document.getElementById("mytable").rows[i].cells;
+                    for (var j = 0 ; j < 6; j++) {
+                        if (counter < arr.length) {
+                            flag = true;
+                            x[j].innerHTML = arr[counter];
+                            counter++;
+                        }
+                        else {
+                            x[j].innerHTML = "";
+                        }
+                    }
+                    if (flag) {
+                        x[6].innerHTML = "<button class='btn btn-primary btn-xs' onclick='details(this)' id =" + id + " > details </button>";
+
+                    }
+                    else {
+                        x[6].innerHTML = "";
+                    }
+                }
+            }
+        });
+    };
+</script>
+<html>
+<head>
+    <title></title>
+    <style>
+        a:hover {
+            background-color: #fafafa;
+            text-decoration: none !important;
+        }
+    </style>
+</head>
+<body>
+    @RenderPage("navbar.cshtml")
+    <div class="container-fluid">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="col-md-9">
+            <div style="width:100%;height:103px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                <h2 style="margin-left:30%;color:#373e4a"> Hospital Managment  System</h2>
+                <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+            </div>
+            <div style="margin-top:20px"></div>
+            <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Employee</h4>
+            <textarea class="form-control" id="search" onkeyup="prev(3)" style="overflow:hidden;width:130px;display:inline;float:right" rows="1"> </textarea>
+            <button type="button" onclick="func()" class="btn btn-primary" style="float:right;margin-right:10px">Add Employee</button>
+            <div style="display:inline" class="container">
+                <table id="mytable" style="color:#a7a7a7; margin-top:20px" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:110px">ID</th>
+                            <th style="width:220px">Name</th>
+                            <th style="width:130px">Type</th>
+                            <th style ="width:130px">Salary</th>
+                            <th style="width:150px">Joining Date</th>
+                            <th>Leaving Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            for (var i = 1; i <= 10; i++)
+                            {
+                                if (i % 2 != 0)
+                                {
+                                    <tr style="background-color:#f8f8f8"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                                }
+                                else
+                                {
+                                    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="container">
+            <ul class="pager">
+                <li><button class="btn btn-primary btn-sm" onclick="prev(1)">Prev</button></li>
+                <li><button class="btn btn-primary btn-sm" onclick="prev(2)">Next</button></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        prev(3);
+    </script>
+</body>
+</html>

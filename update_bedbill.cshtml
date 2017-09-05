@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        var id = info[0];
+        var total = info[1];
+        var release = (string)info[2];
+        
+        if (release == "")
+        {
+            cmd.CommandText = "update patient_admits_bed set total_days =  @total where patient_id = @id and release is null";
+        }
+        else
+        {
+            cmd.CommandText = "update patient_admits_bed set total_days = @total, release=@release where patient_id = @id and release is null";
+        }
+        SqlParameter p1 = new SqlParameter("@total", SqlDbType.Int);
+        p1.Value = @total;
+        cmd.Parameters.Add(p1);
+    }
+    @{
+        if (release != "")
+        {
+            var floor = info[3];
+            var ward = info[4];
+            var bed = info[5];
+            var cmnd = connection.CreateCommand();
+            cmnd.CommandText = "update bed set bed_status = 'free' where floor_no=@floor and ward_no = @ward and bed_no = @bed";
+            SqlParameter p4 = new SqlParameter("@floor", SqlDbType.Int);
+            p4.Value = @floor;
+            cmnd.Parameters.Add(p4);
+            SqlParameter p5 = new SqlParameter("@ward", SqlDbType.Int);
+            p5.Value = @ward;
+            cmnd.Parameters.Add(p5);
+            SqlParameter p6 = new SqlParameter("@bed", SqlDbType.Int);
+            p6.Value = @bed;
+            cmnd.Parameters.Add(p6);
+            cmnd.ExecuteNonQuery();
+            SqlParameter p3 = new SqlParameter("@release", SqlDbType.Date);
+            p3.Value = @release;
+            cmd.Parameters.Add(p3);
+        }
+
+        SqlParameter p2 = new SqlParameter("@id", SqlDbType.Int);
+        p2.Value = @id;
+        cmd.Parameters.Add(p2);
+        cmd.ExecuteNonQuery();
+        connection.Close();
+    }
+</body>
+</html>

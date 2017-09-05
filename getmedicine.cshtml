@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        List<string> list = new List<string>();
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var low = (int)info[0];
+        var name = (string)info[1];
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        cmd.CommandText = "select *  from medicine where medicine_id >= @low  and medicine_name like @name";
+        SqlParameter p1 = new SqlParameter("@low", SqlDbType.Int);
+        p1.Value = @low;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@name", SqlDbType.VarChar);
+        p2.Value = "%" + @name + "%";
+        cmd.Parameters.Add(p2);
+        var row = cmd.ExecuteReader();
+    }
+    @{
+        while (row.Read())
+        {
+            list.Add(row["medicine_id"].ToString());
+            list.Add(row["medicine_name"].ToString());
+            list.Add(row["medicine_price"].ToString());
+        }
+        var jsn = Json.Encode(list);
+        Response.Write(jsn);
+        Response.End();
+        connection.Close();
+    }
+</body>
+</html>

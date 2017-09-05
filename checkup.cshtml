@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    function func(id) {
+        document.getElementById("appoint").href = "appointment.cshtml?id=" + id;
+        document.getElementById("check").href = "doctor_fee.cshtml?id=" + id;
+        document.getElementById("admit_cabin").href = "admit_cabin.cshtml?id=" + id;
+        document.getElementById("admit_bed").href = "admit_bed.cshtml?id=" + id;
+        document.getElementById("med").href = "buy_medicine.cshtml?id=" + id;
+        document.getElementById("diag").href = "patient_diagnosis.cshtml?id=" + id;
+        document.getElementById("cabin_bill").href = "Cabin Bill.cshtml?id=" + id;
+        document.getElementById("bed_bill").href = "Bed Bill.cshtml?id=" + id;
+        document.getElementById("medicine_bill").href = "medicine_bill.cshtml?id=" + id;
+        document.getElementById("diagnosis_bill").href = "diagnosis_bill.cshtml?id=" + id;
+        document.getElementById("cabin_bed_bill").href = "checkup.cshtml?id=" + id;
+    };
+</script>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @RenderPage("sidebar.cshtml")
+    @{
+        var id = (string)Request["id"];
+        <script>
+            func(@id);
+        </script>
+    }
+    <div class="container-fluid">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="col-md-9">
+            <div style="width:100%;height:83px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                <h2 style="margin-left:30%;color:#373e4a"> Hospital Managment  System</h2>
+                <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+            </div>
+            <div style="margin-top:20px"></div>
+            <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Patient Bill</h4> 
+            @{
+                var sum = 0;
+                var total = 0;
+                var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+                var cmd = connection.CreateCommand();
+                connection.Open();
+                cmd.CommandText = "select * from cabin,patient_admits_cabin where patient_admits_cabin.floor_no = cabin.floor_no and patient_admits_cabin.cabin_no = cabin.cabin_no  and patient_id = " + @id;
+                var row = cmd.ExecuteReader();
+            }
+            <table style=" margin-top:20px" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Floor No</th>
+                        <th>Cabin No</th>
+                        <th>Cabin Rate</th>
+                        <th>Admission Date</th>
+                        <th>Release Date </th>
+                        <th>Total Days</th>
+                        <th>Total Bill</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @while (row.Read())
+                    {
+                        var floor = row["floor_no"];
+                        var cabin = row["cabin_no"];
+                        var rate = (int) row["rate"];
+                        var admission = Convert.ToDateTime(row["admission"]).ToString("dd/MM/yyyy");
+                        var release = "null";
+                        if (row["release"].ToString() != "")
+                        {
+                            release = Convert.ToDateTime(row["release"]).ToString("dd/MM/yyyy");
+                        }
+                        total =(int) row["total_days"];
+                        var num = rate * total;
+                        sum = sum + num;
+                        <tr style="color:#a7a7a7"> <td> @floor</td> <td>@cabin</td> <td>@rate</td> <td> @admission</td><td>@release</td><td>@total</td> <td>@num</td></tr>
+                    }
+
+                </tbody>
+                <tr style="color:#a7a7a7"><td>Total Cabin Fee: </td> <td> @sum </td></tr>
+            </table>
+            @{
+                row.Close();
+                cmd.CommandText = "select * from bed,patient_admits_bed where patient_admits_bed.floor_no = bed.floor_no and patient_admits_bed.ward_no = bed.ward_no and patient_admits_bed.bed_no = bed.bed_no and patient_id = " + @id;
+                row = cmd.ExecuteReader();
+                sum = 0;
+            }
+            <table style=" margin-top:20px" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Floor No</th>
+                        <th>Ward No</th>
+                        <th>Bed No</th>
+                        <th>Bed Rate</th>
+                        <th>Admission Date</th>
+                        <th>Release Date </th>
+                        <th>Total Days</th>
+                        <th>Total Bill</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @while (row.Read())
+                    {
+                        var floor = row["floor_no"];
+                        var ward = row["ward_no"];
+                        var bed = row["bed_no"];
+                        var rate = (int)row["rate"];
+                        var admission = Convert.ToDateTime(row["admission"]).ToString("dd/MM/yyyy");
+                        var release = "null";
+                        if (row["release"].ToString() != "")
+                        {
+                            release = Convert.ToDateTime(row["release"]).ToString("dd/MM/yyyy");
+                        }
+                        total = (int)row["total_days"];
+                        var num = rate * total;
+                        sum = sum + num;
+                        <tr style="color:#a7a7a7"> <td> @floor</td> <td>@ward</td> <td>@bed</td> <td>@rate</td> <td> @admission</td><td>@release</td><td>@total</td> <td>@num</td></tr>
+                    }
+                </tbody>
+                <tr style="color:#a7a7a7"><td>Total Bed Fee: </td> <td> @sum </td></tr>
+            </table>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        List<string> list = new List<string>();
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var floor = (int)info[0];
+        var ward = (int)info[1];
+        var bed = (int)info[2];
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        cmd.CommandText = "select *  from bed where floor_no > @floor or (floor_no = @floor and ward_no > @ward) or (floor_no = @floor and ward_no = @ward and bed_no > @bed) order by floor_no, ward_no ,bed_no";
+        SqlParameter p1 = new SqlParameter("@floor", SqlDbType.Int);
+        p1.Value = @floor;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@ward", SqlDbType.Int);
+        p2.Value = @ward;
+        cmd.Parameters.Add(p2);
+        SqlParameter p3 = new SqlParameter("@bed", SqlDbType.Int);
+        p3.Value = @bed;
+        cmd.Parameters.Add(p3);
+        var row = cmd.ExecuteReader();
+    }
+    @{
+        while (row.Read())
+        {
+            list.Add(row["floor_no"].ToString());
+            list.Add(row["ward_no"].ToString());
+            list.Add(row["bed_no"].ToString());
+            list.Add(row["rate"].ToString());
+            list.Add(row["bed_status"].ToString());
+        }
+        var jsn = Json.Encode(list);
+        Response.Write(jsn);
+        Response.End();
+        connection.Close();
+    }
+</body>
+</html>

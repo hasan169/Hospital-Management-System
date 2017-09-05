@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        var diagnosis = info[0];
+        var patient = info[1];
+        var date = info[2];
+        cmd.CommandText = "insert into patient_diagnosis values (@diagnosis,@patient,@date)";
+        SqlParameter p1 = new SqlParameter("@diagnosis", SqlDbType.Int);
+        p1.Value = @diagnosis;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@patient", SqlDbType.Int);
+        p2.Value = @patient;
+        cmd.Parameters.Add(p2);
+        SqlParameter p3 = new SqlParameter("@date", SqlDbType.Date);
+        p3.Value = @date;
+        cmd.Parameters.Add(p3);
+        cmd.ExecuteNonQuery();
+        connection.Close();
+    }
+</body>
+</html>

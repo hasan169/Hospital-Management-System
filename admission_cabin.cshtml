@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        var floor = info[0];
+        var cabin = info[1];
+        var patient = info[2];
+        var date = info[3];
+        cmd.CommandText = "insert into patient_admits_cabin (floor_no,cabin_no,patient_id,admission) values (@floor,@cabin,@patient,@date)";
+        SqlParameter p1 = new SqlParameter("@floor", SqlDbType.Int);
+        p1.Value = @floor;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@cabin", SqlDbType.Int);
+        p2.Value = @cabin;
+        cmd.Parameters.Add(p2);
+        SqlParameter p3 = new SqlParameter("@patient", SqlDbType.Int);
+        p3.Value = @patient;
+        cmd.Parameters.Add(p3);
+        SqlParameter p4 = new SqlParameter("@date", SqlDbType.Date);
+        p4.Value = @date;
+        cmd.Parameters.Add(p4);
+        cmd.ExecuteNonQuery();
+        var cmnd = connection.CreateCommand();
+        cmnd.CommandText = "update cabin set cabin_status = 'Not Free' where floor_no = @floor and cabin_no = @cabin";
+        SqlParameter p5 = new SqlParameter("@floor", SqlDbType.Int);
+        p5.Value = @floor;
+        cmnd.Parameters.Add(p5);
+        SqlParameter p6 = new SqlParameter("@cabin", SqlDbType.Int);
+        p6.Value = @cabin;
+        cmnd.Parameters.Add(p6);
+        cmnd.ExecuteNonQuery();
+        connection.Close();
+    }
+</body>
+</html>

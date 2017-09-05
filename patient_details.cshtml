@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    function update(id) {
+        var name = document.getElementById("patient").value;
+        var address = document.getElementById("address").value;
+        var age = document.getElementById("age").value;
+        var selector = document.getElementById("gender");
+        var gender = selector[selector.selectedIndex].value;
+        var mobile = document.getElementById("mobile").value;
+        selector = document.getElementById("blood");
+        var blood = selector[selector.selectedIndex].value;
+        var release = document.getElementById("release").value;
+        var info = [];
+        info.push(id);
+        info.push(name);
+        info.push(address);
+        info.push(age);
+        info.push(gender);
+        info.push(mobile);
+        info.push(blood);
+        info.push(release);
+        $.ajax({
+            type: "POST",
+            url: "update_patient",
+            data: JSON.stringify(info),
+            datatype: "html",
+            success: function () {
+                alert("updated");
+            }
+        });
+    };
+    function func(id) {
+        document.getElementById("appoint").href = "appointment.cshtml?id=" + id;
+        document.getElementById("check").href = "doctor_fee.cshtml?id=" + id;
+        document.getElementById("admit_cabin").href = "admit_cabin.cshtml?id=" + id;
+        document.getElementById("admit_bed").href = "admit_bed.cshtml?id=" + id;
+        document.getElementById("med").href = "buy_medicine.cshtml?id=" + id;
+        document.getElementById("diag").href = "patient_diagnosis.cshtml?id=" + id;
+        document.getElementById("cabin_bill").href = "Cabin Bill.cshtml?id=" + id;
+        document.getElementById("bed_bill").href = "Bed Bill.cshtml?id=" + id;
+        document.getElementById("medicine_bill").href = "medicine_bill.cshtml?id=" + id;
+        document.getElementById("diagnosis_bill").href = "diagnosis_bill.cshtml?id=" + id;
+        document.getElementById("cabin_bed_bill").href = "checkup.cshtml?id=" + id;
+    };
+</script>
+<html>
+    <head>
+
+        <title></title>
+    </head>
+    <body>
+        @RenderPage("sidebar.cshtml")
+        @{
+      
+            var id = (string) Request["id"];
+            <script>
+                func(@id);
+            </script>
+        }
+        <div class="container-fluid" style="display:inline">
+            <!--This is a comment. Comments are not displayed in the browser-->
+            <div class="col-md-9">
+                <div style="width:100%;height:83px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                    <h2 style="margin-left:30%;margin-top:-3px; color:#373e4a"> Hospital Managment  System</h2>
+                    <a style="color:black;margin-left:90%" href="~/logout.cshtmlp"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+                </div>
+                <div style="margin-top:20px"></div>
+                <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Profile</h4>
+                @{
+                    string[] group = { "A+", "A-", "AB+","AB-","B+", "B-" ,"O+","O-"};
+                    var name = "";
+                    var address = "";
+                    var gender = "";
+                    var age = "";
+                    var blood = "";
+                    var mobile = "";
+                    var gen1 = "Male";
+                    var gen2 = "Female";
+                    var release = "";
+                }
+                @{
+                    var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+                    var cmd = connection.CreateCommand();
+                    connection.Open();
+                    cmd.CommandText = "select * from patient where patient_id = " + @id;
+                    var row = cmd.ExecuteReader();
+                }
+                @if (row.Read())
+                {
+                    name = (string)row["patient_name"];
+                    address = (string)row["patient_address"];
+                    age = (string)row["age"];
+                    mobile = (string)row["mobile"];
+                    blood = (string)row["blood"];
+                    gender = (string)row["gender"];
+                    if(row["release"].ToString() != ""){
+                        release = Convert.ToDateTime(row["release"]).ToString("MM/dd/yyyy"); ;
+                    }
+                    if (gender == "Female")
+                    {
+                        gen1 = "Female";
+                        gen2 = "Male";
+                    }
+                    row.Close();
+                }
+
+                @{
+                    <div class="container">
+                       <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Full Name:</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" rows="1" id="patient">@name</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="control-label col-sm-2"> Address:</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" rows="1" id="address">@address</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Age:</label>
+                                <div class="col-sm-6">
+                                    <textarea class="form-control" rows="1" id="age">@age</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Gender:</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="gender">
+                                        <option>@gen1</option>
+                                        <option>@gen2</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Mobile:</label>
+                                <div class="col-sm-6">
+                                    <textarea  class="form-control" rows="1" id="mobile">@mobile</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Blood Group:</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" id="blood">
+                                        <option>@blood</option>
+                                        @for (var i = 0; i <= 7; i++)
+                                        {
+                                            if (@blood != @group[i])
+                                            {
+                                                <option>@group[i]</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                           <div class="form-group">
+                               <label class="control-label col-sm-2">Release Date:</label>
+                               <div class="col-sm-6">
+                                   <input type="date" class="form-control" id="release" value="@release"/>
+                               </div>
+                           </div>
+                        </form>
+                             <div class="col-sm-offset-2 col-sm-10">
+                                  <button type="submit" class="btn btn-primary" onclick="update(@id)"> Update</button>
+                             </div>
+                            
+                    </div>
+                } 
+            </div>
+        </div>
+    </body>
+</html>

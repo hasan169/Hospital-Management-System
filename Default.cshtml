@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="@Href("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+<html>
+<head>
+    <title></title>
+</head>
+
+<body style="background-color:#EFFBFB">
+    @{
+        if (Request.Cookies["hospital"] != null)
+        {
+            Response.Redirect("homepage.cshtml");
+        }
+    }
+    <div class="container" style="margin-left:20%;margin-top:15%">
+        <form class="form-horizontal" method="post" action="">
+            <div class="form-group">
+                <label class="control-label col-sm-2">Email:</label>
+                <div class="col-sm-4">
+                    <input type="email" class="form-control" name="email" placeholder="Enter Email ">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2"> Password:</label>
+                <div class="col-sm-4">
+                    <input type="password" class="form-control" name="pass" placeholder="Enter password">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <input type="submit" class="btn btn-primary" value="Login" />
+                </div>
+            </div>
+
+        </form>
+    </div>
+    @{
+        if (IsPost)
+        {
+            var email = Request["email"];
+            var pass = Request["pass"];
+            var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+            var cmd = connection.CreateCommand();
+            connection.Open();
+            cmd.CommandText = "select  * from hospital_admin";
+            var row = cmd.ExecuteReader();
+            row.Read();
+            if (email == (string)row["email"])
+            {
+                if (pass == (string)row["pass"])
+                {
+                    Response.Cookies["hospital"].Value = "admin";
+                    Response.Redirect("homepage.cshtml");
+                }
+            }
+            connection.Close();
+        }
+    }
+</body>
+</html>

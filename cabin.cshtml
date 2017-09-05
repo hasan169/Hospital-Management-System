@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="~/css/bootstrap.min.css" rel="stylesheet">
+<script src="~/Scripts/jquery-1.8.2.min.js"></script>
+<script>
+    var floor;
+    var cabin;
+    var current_floor = 0;
+    var current_cabin = 0;
+    var floor_no = [];
+    var cabin_no = [];
+    function func() {
+        window.location.href = "cabin_reg.cshtml";
+    };
+    function details(floor, cabin) {
+        window.location.href = "cabin_details.cshtml?floor=" + floor + "&cabin=" + cabin;
+    };
+    function prev(mark) {
+        if( mark == 3 ){
+            floor_no.push(0);
+            cabin_no.push(0);
+        }
+        else if (mark == 1) {
+            if (floor_no.length == 1) {
+                return;
+            }
+            floor_no.pop();
+            cabin_no.pop();
+            len = floor_no.length;
+            len--;
+            current_floor = floor_no[len];
+            current_cabin = cabin_no[len];            
+        }
+        else if (mark == 2) {
+            if (current_floor == floor && current_cabin == cabin) {
+                return;
+            }
+            floor_no.push(current_floor);
+            cabin_no.push(current_cabin);
+        }
+        var info = [];
+        info.push(current_floor);
+        info.push(current_cabin);
+        $.ajax({
+            type: "POST",
+            url: "getallcabin.cshtml",
+            data: JSON.stringify(info),
+            datatype: "html",
+            success: function (data) {
+                var arr = $.parseJSON(data);
+                if (mark == 3 ) {
+                    var num = arr.length / 4;
+                    num--;
+                    floor = parseInt(arr[4 * num]);
+                    cabin = parseInt(arr[(4 * num) + 1]);
+                }
+                var counter = 0;
+                for (var i = 1; i <= 10 ; i++) {
+                    
+                    if (counter < arr.length) {
+                        current_floor = parseInt(arr[counter]);
+                        current_cabin = parseInt(arr[counter + 1]);
+                    }
+                    var flag = false;
+                    var x = document.getElementById("mytable").rows[i].cells;
+                    for (var j = 0 ; j < 4; j++) {
+                        if (counter < arr.length) {
+                            flag = true;
+                            x[j].innerHTML = arr[counter];
+                            counter++;
+                        }
+                        else {
+                            x[j].innerHTML = "";
+                        }
+                    }
+                    if (flag) {
+                        x[4].innerHTML = "<button class='btn btn-primary btn-xs' onclick='details("+ current_floor +", "+ current_cabin + ")' > details </button>";
+                    }
+                    else {
+                        x[4].innerHTML = "";
+                    }
+                }
+            }
+        });
+    };
+</script>
+<html>
+<head>
+    <title></title>
+    <style>
+        a:hover {
+            background-color: #fafafa;
+            text-decoration: none !important;
+        }
+    </style>
+</head>
+<body>
+    @RenderPage("navbar.cshtml")
+    <div class="container-fluid">
+        <!--This is a comment. Comments are not displayed in the browser-->
+        <div class="col-md-9">
+            <div style="width:100%;height:101px;border-width:1px;border-bottom-style:double;border-bottom-color:#eeeeee">
+                <h2 style="margin-left:30%;color:#373e4a"> Hospital Managment  System</h2>
+                <a style="color:black;margin-left:90%" href="~/logout.cshtml"> Logout <img style="width:20px;height:20px" src="css/logout.png" /> </a>
+            </div>
+            <div style="margin-top:20px"></div>
+            <img src="css/right.png" style="display:inline; width:25px;height:25px" /> <h4 style="display:inline">Cabin</h4>
+            <button type="button" onclick="func()" class="btn btn-primary" style="float:right">Add Cabin</button>
+            <div style="display:inline" class="container">
+                <table id="mytable" style="width:640px;margin-top:20px;margin-left:160px;color:#a7a7a7" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:150px">Floor No</th>
+                            <th style="width:150px">Cabin No</th>
+                            <th style="width:150px">Rate</th>
+                            <th style="width:120px">Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            for (var i = 1; i <= 10; i++)
+                            {
+                                if (i % 2 != 0)
+                                {
+                                    <tr style="background-color:#f8f8f8"><td></td><td></td><td></td><td></td><td></td></tr>
+                                }
+                                else
+                                {
+                                    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="container">
+            <ul class="pager">
+                <li><button class="btn btn-primary btn-sm" onclick="prev(1)">Prev</button></li>
+                <li><button class="btn btn-primary btn-sm" onclick="prev(2)">Next</button></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        prev(3);
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        List<string> list = new List<string>();
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var name = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        cmd.CommandText = "select doctor_name,doctor_id from doctor where department =  @name";
+
+        SqlParameter p1 = new SqlParameter("@name", SqlDbType.VarChar);
+        p1.Value = @name;
+        cmd.Parameters.Add(p1);
+        var row = cmd.ExecuteReader();
+       }
+        @{
+        while (row.Read()) { 
+           list.Add(row["doctor_name"].ToString());
+           list.Add(row["doctor_id"].ToString());
+        }
+        var jsn = Json.Encode(list);
+        Response.Write(jsn);
+        Response.End();
+        connection.Close();
+    }
+</body>
+</html>

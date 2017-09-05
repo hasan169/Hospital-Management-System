@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        List<string> list = new List<string>();
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var floor = (int)info[0];
+        var cabin = (int)info[1];
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        cmd.CommandText = "select *  from cabin where floor_no > @floor or (floor_no = @floor and cabin_no > @cabin) order by floor_no, cabin_no";
+        SqlParameter p1 = new SqlParameter("@floor", SqlDbType.Int);
+        p1.Value = @floor;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@cabin", SqlDbType.Int);
+        p2.Value =  @cabin;
+        cmd.Parameters.Add(p2);
+        var row = cmd.ExecuteReader();
+    }
+    @{
+        while (row.Read())
+        {
+            list.Add(row["floor_no"].ToString());
+            list.Add(row["cabin_no"].ToString());
+            list.Add(row["rate"].ToString());
+            list.Add(row["cabin_status"].ToString());
+        }
+        var jsn = Json.Encode(list);
+        Response.Write(jsn);
+        Response.End();
+        connection.Close();
+    }
+</body>
+</html>

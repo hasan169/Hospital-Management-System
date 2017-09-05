@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+@using System.Data;
+@using System.Data.SqlClient;
+@using System;
+@using System.Collections;
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    @{
+        string json;
+        using (var reader = new StreamReader(Request.InputStream))
+        {
+            json = reader.ReadToEnd();
+        }
+        var info = Json.Decode(json);
+        var connection = new SqlConnection("Data Source=SHAGOR;Initial Catalog=hospital_managment_system;Integrated Security=True;Pooling=False");
+        var cmd = connection.CreateCommand();
+        connection.Open();
+        var floor = info[0];
+        var ward = info[1];
+        var bed = info[2];
+        var patient = info[3];
+        var date = info[4];
+        cmd.CommandText = "insert into patient_admits_bed (floor_no,ward_no,bed_no,patient_id,admission) values (@floor,@ward,@bed,@patient,@date)";
+        SqlParameter p1 = new SqlParameter("@floor", SqlDbType.Int);
+        p1.Value = @floor;
+        cmd.Parameters.Add(p1);
+        SqlParameter p2 = new SqlParameter("@ward", SqlDbType.Int);
+        p2.Value = @ward;
+        cmd.Parameters.Add(p2);
+        SqlParameter p3 = new SqlParameter("@bed", SqlDbType.Int);
+        p3.Value = @bed;
+        cmd.Parameters.Add(p3);
+        SqlParameter p4 = new SqlParameter("@patient", SqlDbType.Int);
+        p4.Value = @patient;
+        cmd.Parameters.Add(p4);
+        SqlParameter p5 = new SqlParameter("@date", SqlDbType.Date);
+        p5.Value = @date;
+        cmd.Parameters.Add(p5);
+        cmd.ExecuteNonQuery();
+        var cmnd = connection.CreateCommand();
+        cmnd.CommandText = "update bed set bed_status = 'Not Free' where floor_no = @floor and ward_no = @ward and bed_no = @bed" ;
+        SqlParameter p6 = new SqlParameter("@floor", SqlDbType.Int);
+        p6.Value = @floor;
+        cmnd.Parameters.Add(p6);
+        SqlParameter p7 = new SqlParameter("@ward", SqlDbType.Int);
+        p7.Value = @ward;
+        cmnd.Parameters.Add(p7);
+        SqlParameter p8 = new SqlParameter("@bed", SqlDbType.Int);
+        p8.Value = @bed;
+        cmnd.Parameters.Add(p8);
+        cmnd.ExecuteNonQuery();
+        connection.Close();
+    }
+</body>
+</html>
